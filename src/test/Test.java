@@ -18,21 +18,21 @@ public class Test {
 			int[] array2 = array1.clone();
 
 			// Testeo QuickSortSecuencial
-			long tiempoInicio = System.nanoTime();
+			long tiempoInicial = System.nanoTime();
 			QuickSortSecuencial.quickSort(array1, 0, array1.length - 1);
 			long tiempoFinal = System.nanoTime();
-			long secuencialDuration = tiempoFinal - tiempoInicio;
+			long duracionSecuencial = tiempoFinal - tiempoInicial;
 
 			// Testeo QuickSortConcurrente
 			ForkJoinPool pool = new ForkJoinPool();
 			QuickSortConcurrente task = new QuickSortConcurrente(0, array2.length - 1, array2);
-			tiempoInicio = System.nanoTime();
+			tiempoInicial = System.nanoTime();
 			pool.invoke(task);
 			tiempoFinal = System.nanoTime();
-			long concurrenteDuration = tiempoInicio - tiempoFinal;
+			long duracionConcurrente = tiempoFinal - tiempoInicial;
 
-			// Imprimo los resultados en csv para poder procesar los datos
-			System.out.println(size + "," + secuencialDuration + "," + concurrenteDuration);
+			// Imprimo los resultados en formato csv para poder procesarlos 
+			System.out.println(size + "," + duracionSecuencial + "," + duracionConcurrente);
 		}
 	}
 
