@@ -2,52 +2,53 @@ package algoritmos;
 
 public class QuickSortSecuencial {
 
-	public static void quickSort(int[] array, int low, int high) {
-		if (low < high) {
-			int pivotIndex = partition(array, low, high);
-			quickSort(array, low, pivotIndex - 1);
-			quickSort(array, pivotIndex + 1, high);
-		}
+	// Una función de utilidad para intercambiar dos elementos
+	static void swap(int[] arr, int i, int j) {
+		int temp = arr[i];
+		arr[i] = arr[j];
+		arr[j] = temp;
 	}
 
-	private static int partition(int[] array, int low, int high) {
-		int pivot = array[high];
-		int i = low - 1;
+	// Esta función toma el último elemento como pivote,
+	// coloca el elemento pivote en su posición correcta
+	// en el array ordenado, y coloca todos los elementos
+	// menores a la izquierda del pivote y todos los mayores
+	// a la derecha del pivote
+	static int partition(int[] arr, int low, int high) {
+		// Eligiendo el pivote
+		int pivot = arr[high];
 
-		for (int j = low; j < high; j++) {
-			if (array[j] <= pivot) {
+		// Índice del elemento menor e indica
+		// la posición correcta del pivote encontrada hasta ahora
+		int i = (low - 1);
+
+		for (int j = low; j <= high - 1; j++) {
+			// Si el elemento actual es menor que el pivote
+			if (arr[j] < pivot) {
+				// Incrementar el índice del elemento menor
 				i++;
-				swap(array, i, j);
+				swap(arr, i, j);
 			}
 		}
-
-		swap(array, i + 1, high);
-		return i + 1;
+		swap(arr, i + 1, high);
+		return (i + 1);
 	}
 
-	private static void swap(int[] array, int i, int j) {
-		int temp = array[i];
-		array[i] = array[j];
-		array[j] = temp;
-	}
+	// La función principal que implementa QuickSort
+	// arr[] --> Array a ordenar,
+	// low --> Índice inicial,
+	// high --> Índice final
+	public static void quickSort(int[] arr, int low, int high) {
+		if (low < high) {
+			// pi es el índice de partición, arr[pi]
+			// ahora está en el lugar correcto
+			int pi = partition(arr, low, high);
 
-	public static void main(String[] args) {
-		int[] array = { 10, 7, 8, 9, 1, 5 };
-		int n = array.length;
-
-		System.out.println("Array original:");
-		printArray(array);
-
-		quickSort(array, 0, n - 1);
-
-		System.out.println("Array ordenado:");
-		printArray(array);
-	}
-
-	private static void printArray(int[] array) {
-		for (int value : array) {
-			System.out.print(value + " ");
+			// Ordenar por separado los elementos antes
+			// de la partición y después de la partición
+			quickSort(arr, low, pi - 1);
+			quickSort(arr, pi + 1, high);
 		}
-		System.out.println();
 	}
+
 }

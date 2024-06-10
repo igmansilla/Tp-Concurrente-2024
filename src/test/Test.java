@@ -10,28 +10,28 @@ public class Test {
 
 	public static void main(String[] args) {
 		int[] sizes = { 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 5000, 10000, 50000, 100000, 500000, 1000000,
-				10000000, 100000000};
+				10000000, 100000000, 1000000000 };
 		System.out.println("Tamaño,TiempoSecuencial,TiempoConcurrente");
 
 		for (int size : sizes) {
 			int[] array1 = generateRandomArray(size);
 			int[] array2 = array1.clone();
 
-			// Test QuickSortSecuencial
-			long startTime = System.nanoTime();
+			// Testeo QuickSortSecuencial
+			long tiempoInicio = System.nanoTime();
 			QuickSortSecuencial.quickSort(array1, 0, array1.length - 1);
-			long endTime = System.nanoTime();
-			long secuencialDuration = endTime - startTime;
+			long tiempoFinal = System.nanoTime();
+			long secuencialDuration = tiempoFinal - tiempoInicio;
 
-			// Test QuickSortConcurrente
+			// Testeo QuickSortConcurrente
 			ForkJoinPool pool = new ForkJoinPool();
 			QuickSortConcurrente task = new QuickSortConcurrente(0, array2.length - 1, array2);
-			startTime = System.nanoTime();
+			tiempoInicio = System.nanoTime();
 			pool.invoke(task);
-			endTime = System.nanoTime();
-			long concurrenteDuration = endTime - startTime;
+			tiempoFinal = System.nanoTime();
+			long concurrenteDuration = tiempoInicio - tiempoFinal;
 
-			// Print results in CSV format
+			// Imprimo los resultados en csv para poder procesar los datos
 			System.out.println(size + "," + secuencialDuration + "," + concurrenteDuration);
 		}
 	}

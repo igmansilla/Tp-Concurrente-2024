@@ -1,98 +1,63 @@
 package algoritmos;
 
-import java.util.Random;
-import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
 
 public class QuickSortConcurrente extends RecursiveTask<Integer> {
+    private static final long serialVersionUID = 1L;
+    int inicio, fin;
+    int[] arreglo;
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	int start, end;
-	int[] arr;
+    // Constructor
+    public QuickSortConcurrente(int inicio, int fin, int[] arreglo) {
+        this.arreglo = arreglo; // Guarda el arreglo a ordenar
+        this.inicio = inicio;   // Guarda el índice inicial del segmento del arreglo a ordenar
+        this.fin = fin;         // Guarda el índice final del segmento del arreglo a ordenar
+    }
 
-	/**
-	 * Finding random pivoted and partition array on a pivot. There are many
-	 * different partitioning algorithms.
-	 * 
-	 * @param start
-	 * @param end
-	 * @param arr
-	 * @return
-	 */
-	 private int partition(int start, int end, int[] arr) {
-	        int pivot = arr[start + (end - start) / 2];  // Use median of the segment as pivot
-	        int left = start - 1;
-	        int right = end + 1;
-	        
-	        while (true) {
-	            do {
-	                left++;
-	            } while (arr[left] < pivot);
-	            
-	            do {
-	                right--;
-	            } while (arr[right] > pivot);
-	            
-	            if (left >= right) {
-	                return right;
-	            }
-	            
-	            int temp = arr[left];
-	            arr[left] = arr[right];
-	            arr[right] = temp;
-	        }
-	    }
-	// Function to implement
-	// QuickSort method
-	public QuickSortConcurrente(int start, int end, int[] arr) {
-		this.arr = arr;
-		this.start = start;
-		this.end = end;
-	}
+    // Método para particionar el arreglo
+    private int particion(int inicio, int fin, int[] arreglo) {
+        int pivote = arreglo[inicio + (fin - inicio) / 2]; // Establece el elemento medio como pivote
+        int izquierda = inicio - 1; // Inicializa el índice izquierdo para la exploración
+        int derecha = fin + 1; // Inicializa el índice derecho para la exploración
 
-	@Override
-	protected Integer compute() {
-		// Base case
-		if (start >= end)
-			return null;
+        while (true) {
+            do {
+                izquierda++; // Incrementa el índice izquierdo hasta encontrar un elemento mayor que el pivote
+            } while (arreglo[izquierda] < pivote);
 
-		// Find partition
-		int p = partition(start, end, arr);
+            do {
+                derecha--; // Decrementa el índice derecho hasta encontrar un elemento menor que el pivote
+            } while (arreglo[derecha] > pivote);
 
-		// Divide array
-		QuickSortConcurrente left = new QuickSortConcurrente(start, p - 1, arr);
+            if (izquierda >= derecha) {
+                return derecha; // Devuelve el índice de partición donde los elementos están divididos
+            }
 
-		QuickSortConcurrente right = new QuickSortConcurrente(p + 1, end, arr);
+            // Intercambia los elementos en índices izquierda y derecha
+            int temp = arreglo[izquierda];
+            arreglo[izquierda] = arreglo[derecha];
+            arreglo[derecha] = temp;
+        }
+    }
 
-		// Left subproblem as separate thread
-		left.fork();
-		right.compute();
+    // Método compute que define la lógica concurrente del algoritmo QuickSort
+    @Override
+    protected Integer compute() {
+        if (inicio >= fin) { // Si el segmento es trivial (0 o 1 elemento), no hace falta ordenar
+            return null;
+        }
 
-		// Wait until left thread complete
-		left.join();
+        int p = particion(inicio, fin, arreglo); // Particiona el arreglo y obtiene el índice del pivote
 
-		// We don't want anything as return
-		return null;
-	}
+        // Crea tareas concurrentes para ordenar las subpartes
+        QuickSortConcurrente izquierda = new QuickSortConcurrente(inicio, p - 1, arreglo);
+        QuickSortConcurrente derecha = new QuickSortConcurrente(p + 1, fin, arreglo);
 
-	// Driver Code
-	public static void main(String args[]) {
-		int n = 7;
-		int[] arr = { 54, 64, 95, 82, 12, 32, 63 };
+        izquierda.fork(); // Ejecuta la tarea de ordenar la subparte izquierda en un hilo separado
+        derecha.compute(); // Ejecuta la tarea de ordenar la subparte derecha en el hilo actual
 
-		// Forkjoin ThreadPool to keep
-		// thread creation as per resources
-		ForkJoinPool pool = ForkJoinPool.commonPool();
+        izquierda.join(); // Espera a que la tarea izquierda termine antes de continuar
 
-		// Start the first thread in fork
-		// join pool for range 0, n-1
-		pool.invoke(new QuickSortConcurrente(0, n - 1, arr));
-
-		// Print shorted elements
-		for (int i = 0; i < n; i++)
-			System.out.print(arr[i] + " ");
-	}
+        return null; // Retorna null ya que el método no necesita devolver un valor específico
+    }
 }
